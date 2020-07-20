@@ -9,14 +9,16 @@ from PIL import Image
 # Download the data from https://download.pytorch.org/tutorial/hymenoptera_data.zip
 
 class HymenopteraDataset(Dataset):
-    def __init__(self, root_dir, size=(224,224)):
-        self.files = glob(root_dir)
-        self.size = size
+    def __init__(self, root, transform=None):
+        self.files = glob(root+'/*/*')
+        self.transform = transform
     
     def __len__(self):
         return len(self.files)
   
     def __getitem__(self,idx):
-        img = np.asarray(Image.open(self.files[idx]).resize(self.size))
+        image = np.asarray(Image.open(self.files[idx]).convert('RGB'))
+        if self.transform is not None:
+            image = self.transform(image)
         label = self.files[idx].split('/')[-2]
-        return img, label
+        return image, label
